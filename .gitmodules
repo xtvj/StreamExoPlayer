@@ -1,0 +1,3 @@
+[submodule "baselibrary"]
+	path = baselibrary
+	url = https://github.com/xtvj/BaseProject.git
