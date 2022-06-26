@@ -1,0 +1,74 @@
+
+[versions]
+
+versionCode      = "1"
+versionName      = "1.0.0"
+minSdk           = "23"
+targetSdk        = "32"
+compileSdk       = "32"
+
+
+application      = "7.2.1"
+library          = "7.2.1"
+kotlin           = "1.7.0"
+hilt_build       = '2.42'
+
+core-ktx         = "1.8.0"
+fragment-ktx     = "1.4.1"
+activity-ktx     = "1.4.0"
+appcompat        = "1.4.2"
+junit            = "4.13.2"
+androidx-junit   = "1.1.3"
+espresso-core    = "3.4.0"
+material         = "1.6.1"
+hilt-android     = "2.42"
+hilt-jetpack     = "1.0.0"
+lifecycle        = "2.4.1"
+coroutines       = "1.6.2"
+recyclerview     = "1.2.1"
+constraintlayout = "2.1.4"
+leakcanary       = "2.9.1"
+permissions      = "4.9.1"
+room             = "2.4.2"
+exoplayer        = "2.18.0"
+
+[libraries]
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
+constraintlayout = { module ="androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-android" }
+#hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-jetpack" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-jetpack" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
+permissionsdispatcher = { module = "com.github.permissions-dispatcher:permissionsdispatcher", version.ref = "permissions" }
+permissionsdispatcher-processor = { module = "com.github.permissions-dispatcher:permissionsdispatcher-processor", version.ref = "permissions" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
+exoplayer = {module = "com.google.android.exoplayer:exoplayer",version.ref = "exoplayer"}
+
+[bundles]
+hilt = ["hilt-android", "hilt-work"]
+hilt-kapt = ["hilt-android-compiler"]
+lifecycle = ["lifecycle-viewmodel-ktx","lifecycle-livedata-ktx","lifecycle-runtime-ktx", "lifecycle-viewmodel-savedstate"]
+room = ["room-ktx", "room-paging"]
+
+[plugins]
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt_build" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+library = { id = "com.android.library", version.ref = "library" }
+application = { id = "com.android.application", version.ref = "application" }
