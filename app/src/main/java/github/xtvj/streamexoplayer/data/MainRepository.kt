@@ -1,12 +1,12 @@
 package github.xtvj.streamexoplayer.data
 
 import github.xtvj.streamexoplayer.utils.log
+import github.xtvj.streamexoplayer.utils.md5
 import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.net.URLDecoder
-import java.security.MessageDigest
 import java.util.*
 import java.util.Base64.getDecoder
 import javax.inject.Inject
@@ -132,37 +132,6 @@ class MainRepository @Inject constructor() {
 //            url = "{}?wsSecret={}&wsTime={}&u={}&seqid={}&{}".format(i, m, l, t, f, y)
 //            return url
         }
-    }
-
-
-    /**
-     * md5加密字符串
-     * md5使用后转成16进制变成32个字节
-     */
-    private fun md5(str: String): String {
-        val digest = MessageDigest.getInstance("MD5")
-        val result = digest.digest(str.toByteArray())
-        //没转16进制之前是16位
-        println("result${result.size}")
-        //转成16进制后是32字节
-        return toHex(result)
-    }
-
-    private fun toHex(byteArray: ByteArray): String {
-        val result = with(StringBuilder()) {
-            byteArray.forEach {
-                val hex = it.toInt() and (0xFF)
-                val hexStr = Integer.toHexString(hex)
-                if (hexStr.length == 1) {
-                    this.append("0").append(hexStr)
-                } else {
-                    this.append(hexStr)
-                }
-            }
-            this.toString()
-        }
-        //转成16进制后是32字节
-        return result
     }
 
 }

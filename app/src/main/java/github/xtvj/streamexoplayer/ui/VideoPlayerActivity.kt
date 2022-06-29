@@ -57,6 +57,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         exoPlayer.playWhenReady = true
         binding.videoPlayer.player = exoPlayer
         binding.videoPlayer.requestFocus()
+        exoPlayer.prepare()
     }
 
 
