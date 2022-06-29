@@ -13,4 +13,15 @@
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+
+    <style name="BaseProject.splash" parent="BaseLibrary.Fullscreen">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+    </style>
+
+    <style name="BaseProject.fullscreen" parent="BaseLibrary.Fullscreen">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 </resources>

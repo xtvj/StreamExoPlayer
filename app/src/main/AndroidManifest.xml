@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="github.xtvj.streamexoplayer">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,17 +13,46 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".App"
         android:theme="@style/Theme.StreamExoPlayer"
-        tools:targetApi="31">
+        tools:targetApi="32">
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".ui.SplashActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:theme="@style/BaseProject.splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.VideoPlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask"
+            android:theme="@style/BaseProject.fullscreen"/>
+
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="github.xtvj.streamexoplayer.initializer.StartInitializer"
+                android:value="androidx.startup" />
+            <!--            https://developer.android.com/topic/libraries/architecture/workmanager/advanced/custom-configuration-->
+<!--            <meta-data-->
+<!--                android:name="androidx.work.WorkManagerInitializer"-->
+<!--                android:value="androidx.startup"-->
+<!--                tools:node="remove" />-->
+        </provider>
+
     </application>
 
 </manifest>

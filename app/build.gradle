@@ -44,15 +44,21 @@ dependencies {
     implementation libs.activity.ktx
     implementation libs.appcompat
     implementation libs.constraintlayout
-
     implementation libs.material
     implementation libs.recyclerview
-
 
     implementation libs.bundles.hilt
     kapt libs.bundles.hilt.kapt
 
     implementation libs.exoplayer
+
+    implementation libs.coroutines
+    implementation libs.bundles.lifecycle
+    debugImplementation libs.leakcanary
+
+    implementation libs.okhttp
+    implementation libs.timber
+    implementation libs.startup.runtime
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
