@@ -1,23 +1,35 @@
 package github.xtvj.streamexoplayer.ui
 
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import dagger.hilt.android.AndroidEntryPoint
+import github.xtvj.streamexoplayer.R
 import github.xtvj.streamexoplayer.databinding.ActivityVideoplayerBinding
+import github.xtvj.streamexoplayer.ui.viewmodel.VideoPlayerViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class VideoPlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVideoplayerBinding
     private lateinit var exoPlayer: ExoPlayer
+    private val viewModel by viewModels<VideoPlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +39,30 @@ class VideoPlayerActivity : AppCompatActivity() {
         initializePlayer()
 
         window.decorView.apply {
-            systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
+            systemUiVisibility =
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
         }
+        initView()
+    }
+
+    private fun initView() {
+        binding.btZoom.setOnClickListener {
+            requestedOrientation = if (viewModel.lockSensor.value) {
+                viewModel.lockSensor.value = false
+                ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+            } else {
+                viewModel.lockSensor.value = true
+                ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.lockSensor.collectLatest {
+                binding.btZoom.setImageResource(if (it) R.drawable.ic_lock else R.drawable.ic_un_lock)
+            }
+        }
+        binding.videoPlayer.setControllerVisibilityListener(StyledPlayerView.ControllerVisibilityListener {
+            binding.btZoom.visibility = it
+        })
     }
 
 
@@ -60,10 +94,8 @@ class VideoPlayerActivity : AppCompatActivity() {
         exoPlayer.prepare()
     }
 
-
     companion object {
-        var STREAM_URL =
-            "https://hw.flv.huya.com/src/1394575534-1394575534-5989656310331736064-2789274524-10057-A-0-1-imgplus.flv?wsSecret=e2e768d5f30c09ae01a6f0834f17decb&wsTime=62bc0f3e&u=0&seqid=16564054381903460&fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Aw1%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103"
+        var STREAM_URL = ""
     }
 
 }

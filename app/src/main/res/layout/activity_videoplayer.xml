@@ -30,5 +30,15 @@
                 android:visibility="invisible" />
         </com.google.android.exoplayer2.ui.StyledPlayerView>
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:background="@android:color/transparent"
+            android:padding="@dimen/size_8dp"
+            android:layout_width="@dimen/size_48dp"
+            android:layout_height="@dimen/size_48dp"
+            android:src="@drawable/ic_un_lock"
+            android:id="@+id/bt_zoom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
