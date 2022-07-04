@@ -1,5 +1,6 @@
 package github.xtvj.streamexoplayer.data
 
+import android.text.Html
 import github.xtvj.streamexoplayer.utils.log
 import github.xtvj.streamexoplayer.utils.md5
 import okhttp3.Headers
@@ -7,7 +8,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.net.URLDecoder
-import java.util.*
 import java.util.Base64.getDecoder
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,93 +44,88 @@ class MainRepository @Inject constructor() {
         val client = OkHttpClient()
         val response: Response = client.newCall(request).execute()
         val body = response.body!!.string()
-        val match = Regex("\"liveLineUrl\":\"([\\s\\S]*?)\",")
+        val match = Regex("\"liveLineUrl\":\"([\\s\\S]*?)\"")
         val url = match.find(body)?.value
         val list = url?.split("\"")?.findLast { it.length > 12 }
-        val decoder = Base64.getDecoder()
-        val decodedUrl = String(decoder.decode(list?.toByteArray(Charsets.UTF_8)))
-//        if (decodedUrl.isBlank()){
-//            return null
-//        }
-        if (decodedUrl.contains("replay")) {
-            return decodedUrl
+        val decodedUrl = String(getDecoder().decode(list?.toByteArray(Charsets.UTF_8)))
+//            此方式已失效
+//            val ib = decodedUrl.split("?")
+//            val r = ib[0].split("/")
+//            val s = r[r.size - 1].replace(Regex(".flv|.m3u8"), "")
+//            val c = ib[1].split("&", ignoreCase = false, limit = 3)
+//            val c1 = c.dropWhile {
+//                it.isBlank()
+//            }
+//            val n = c1.flatMap { it.split(Regex("=|&")) }.dropWhile { it.isBlank() }
+//            val fm = URLDecoder.decode(n[n.indexOf("fm") + 1], "utf-8")
+//            val u = String(getDecoder().decode(fm.toByteArray(Charsets.UTF_8)))
+//            val p = u.split("_")[0]
+//            val temp = System.currentTimeMillis()
+//            val tempint = (temp * 10000)
+//            val f = tempint.toString()
+//            val l = n[n.indexOf("wsTime") + 1]
+//            val t = "0"
+//            val h = StringBuilder()
+//                .append(p).append("_")
+//                .append(t).append("_")
+//                .append(s).append("_")
+//                .append(f).append("_")
+//                .append(l)
+//
+//            val m = md5(h.toString())
+//            val y = c1.last()
+//            val urlTemp = "%s?wsSecret=%s&wsTime=%s&u=%s&seqid=%s&%s".format(ib[0], m, l, t, f, y)
+//            return ("https:$urlTemp").replace("hls", "flv").replace("m3u8", "flv")
+
+        val split = decodedUrl.split("?")
+        val url_hls = split[0]
+        val anti_code = split[1]
+        val url_m3u8 = url_hls.replace("bd.hls", "al.flv")
+        val url1 = url_m3u8.replace("m3u8", "flv")
+        val stream_name = url1.split("/").last().replace(Regex(".flv|.m3u8"), "")
+        val hls_url = "https:$url1"
+        val srcAntiCode = Html.fromHtml(anti_code, Html.FROM_HTML_MODE_LEGACY)
+        val c = srcAntiCode.split("&").dropWhile { it.isBlank() }
+        val n = c.flatMap { it.split(Regex("=|&")) }.dropWhile { it.isBlank() }
+        val fm = URLDecoder.decode(n[n.indexOf("fm") + 1], "utf-8")
+        val u = String(getDecoder().decode(fm.toByteArray(Charsets.UTF_8)))
+        val hash_prefix = u.split("_").first()
+        val user_id = 1463993859134
+        val uuid = if (n.indexOf("uuid") < 0) "" else n[n.indexOf("uuid") + 1]
+        val ctype = if (n.indexOf("ctype") < 0) "" else n[n.indexOf("ctype") + 1]
+        val txyp = if (n.indexOf("txyp") < 0) "" else n[n.indexOf("txyp") + 1]
+        val fs = if (n.indexOf("fs") < 0) "" else n[n.indexOf("fs") + 1]
+        val t = if (n.indexOf("t") < 0) "" else n[n.indexOf("t") + 1]
+        val sphdDC = if (n.indexOf("sphdDC") < 0) "" else n[n.indexOf("sphdDC") + 1]
+        val sphdcdn = if (n.indexOf("sphdcdn") < 0) "" else n[n.indexOf("sphdcdn") + 1]
+        val sphd = if (n.indexOf("sphd") < 0) "" else n[n.indexOf("sphd") + 1]
+        val ratio = if (n.indexOf("ratio") < 0) "2000" else n[n.indexOf("ratio") + 1]
+        val mill = System.currentTimeMillis()
+        val seqid = (mill + user_id).toString()
+        val wsTime = (mill/1000 + 3600).toString(16).replace("0x", "")
+        val hash0 = md5("$seqid|$ctype|$t")
+        val hash1 = md5(hash_prefix + "_" + user_id + "_" + stream_name + "_" + hash0 + "_" + wsTime)
+        return if (ctype.contains("mobile")) {
+            "%s?wsSecret=%s&wsTime=%s&uuid=%s&uid=%s&seqid=%s&ratio=%s&txyp=%s&fs=%s&ctype=%s&ver=1&t=%s&sv=2107230339&sphdDC=%s&sphdcdn=%s&sphd=%s"
+                .format(
+                    hls_url,
+                    hash1,
+                    wsTime,
+                    uuid,
+                    user_id.toString(),
+                    seqid,
+                    ratio,
+                    txyp,
+                    fs,
+                    ctype,
+                    t,
+                    sphdDC,
+                    sphdcdn,
+                    sphd
+                )
         } else {
-//            //hw.hls.huya.com/src/78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus.m3u8
-//           ?ratio=2000
-//           &wsSecret=4bfea730e2939d69832131335c4e747f
-//           &wsTime=62bd5426
-//           &fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D
-//           &ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct
-//           &
-//           &sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2
-//           &sphdDC=huya&sphd=264_*-265_*
-//           &t=103
-
-//            i: //hw.hls.huya.com/src/78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus.m3u8
-//            b: ratio=2000&wsSecret=4bfea730e2939d69832131335c4e747f&wsTime=62bd5426&fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103
-//            r:  ['', '', 'hw.hls.huya.com', 'src', '78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus.m3u8']
-//            s: 78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus
-//            c:  ['ratio=2000', 'wsSecret=4bfea730e2939d69832131335c4e747f', 'wsTime=62bd5426', 'fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103']
-//            c:  ['ratio=2000', 'wsSecret=4bfea730e2939d69832131335c4e747f', 'wsTime=62bd5426', 'fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103']
-//            n:  {'ratio': '2000', 'wsSecret': '4bfea730e2939d69832131335c4e747f', 'wsTime': '62bd5426', 'fm': 'RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype'}
-//            fm:  RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw==&ctype
-//            u:  DWq8BcJ3h6DJt6TY_$0_$1_$2_$3
-//            p:  DWq8BcJ3h6DJt6TY
-//            f:  16564886128028710
-//            l:  62bd5426
-//            t:  0
-//            h:  DWq8BcJ3h6DJt6TY_0_78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus_16564886128028710_62bd5426
-//            m:  786a7ed8590f41dbf33cc073e83215db
-//            y:  fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103
-//            url:  //hw.hls.huya.com/src/78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus.m3u8?wsSecret=786a7ed8590f41dbf33cc073e83215db&wsTime=62bd5426&u=0&seqid=16564886128028710&fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103
-//            该直播间源地址为：
-//            https://hw.flv.huya.com/src/78941969-2559461593-10992803837303062528-2693342886-10057-A-0-1-imgplus.flv?wsSecret=786a7ed8590f41dbf33cc073e83215db&wsTime=62bd5426&u=0&seqid=16564886128028710&fm=RFdxOEJjSjNoNkRKdDZUWV8kMF8kMV8kMl8kMw%3D%3D&ctype=tars_mobile&txyp=o%3Anceic2%3B&fs=bgct&&sphdcdn=al_7-tx_3-js_3-ws_7-bd_2-hw_2&sphdDC=huya&sphd=264_*-265_*&t=103
-            val ib = decodedUrl.split("?")
-            val r = ib[0].split("/")
-            val s = r[r.size - 1].replace(Regex(".flv|.m3u8"), "")
-            val c = ib[1].split("&", ignoreCase = false, limit = 3)
-            val c1 = c.dropWhile {
-                it.isBlank()
-            }
-            val n = c1.flatMap { it.split(Regex("=|&")) }.dropWhile { it.isBlank() }
-            val fm = URLDecoder.decode(n[n.indexOf("fm") + 1], "utf-8")
-            val u = String(getDecoder().decode(fm.toByteArray(Charsets.UTF_8)))
-            val p = u.split("_")[0]
-            val temp = System.currentTimeMillis()
-            val tempint = (temp * 10000)
-            val f = tempint.toString()
-            val l = n[n.indexOf("wsTime") + 1]
-            val t = "0"
-            val h = StringBuilder()
-                .append(p).append("_")
-                .append(t).append("_")
-                .append(s).append("_")
-                .append(f).append("_")
-                .append(l)
-
-            val m = md5(h.toString())
-            val y = c1.last()
-            val urlTemp = "%s?wsSecret=%s&wsTime=%s&u=%s&seqid=%s&%s".format(ib[0], m, l, t, f, y)
-            return ("https:$urlTemp").replace("hls", "flv").replace("m3u8", "flv")
-
-//            def live(e):
-//            i, b = e.split('?')
-//            r = i.split('/')
-//            s = re.sub(r'.(flv|m3u8)', '', r[-1])
-//            c = b.split('&', 3)
-//            c = [i for i in c if i != '']
-//            n = {i.split('=')[0]: i.split('=')[1] for i in c}
-//            fm = urllib.parse.unquote(n['fm'])
-//            u = base64.b64decode(fm).decode('utf-8')
-//            p = u.split('_')[0]
-//            f = str(int(time.time() * 1e7))
-//            l = n['wsTime']
-//            t = '0'
-//            h = '_'.join([p, t, s, f, l])
-//            m = hashlib.md5(h.encode('utf-8')).hexdigest()
-//            y = c[-1]
-//            url = "{}?wsSecret={}&wsTime={}&u={}&seqid={}&{}".format(i, m, l, t, f, y)
-//            return url
+            "%s?wsSecret=%s&wsTime=%s&seqid=%s&ctype=%s&ver=1&txyp=%s&fs=%s&ratio=%s&u=%s&t=%s&sv=2107230339"
+                .format(hls_url, hash1, wsTime, seqid, ctype, txyp, fs, ratio, user_id.toString(), t)
         }
     }
 
